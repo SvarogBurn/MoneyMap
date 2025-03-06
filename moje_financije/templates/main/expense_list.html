@@ -33,8 +33,8 @@
                     <a href="{% url 'expense_detail' expense.pk %}" class="text-blue-600 hover:underline font-semibold">{{ expense.name }}</a>
                 </td>
                 <td class="py-3 px-4 border">{{ expense.category.name }}</td>
-                <td class="py-3 px-4 border">{{ expense.is_fixed|yesno:"Yes,No" }}</td>
-                <td class="py-3 px-4 border">{{ expense.is_necessity|yesno:"Yes,No" }}</td>
+                <td class="py-3 px-4 border">{{ expense.is_fixed|yesno:"Fixed,Varriable" }}</td>
+                <td class="py-3 px-4 border">{{ expense.is_necessity|yesno:"Need,Want" }}</td>
                 <td class="py-3 px-4 border font-bold">€{{ expense.amount|floatformat:2 }}</td>
             </tr>
             {% empty %}

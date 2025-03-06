@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from main.models import Expense, Income, Goal, Category
 from django.db.models import Sum
-
+from django.utils.timezone import now
 #------------------------Mixin for Filtering--------------------------------
 class SearchMixin:
     search_fields = []
@@ -55,7 +55,6 @@ class ExpenseList(BaseListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        from django.utils.timezone import now
         current_month = now().month
         current_year = now().year
 
@@ -107,6 +106,28 @@ class ExpenseDelete(BaseDeleteView):
 class IncomeList(BaseListView):
     model = Income
     template_name = 'main/income_list.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        current_month = now().month
+        current_year = now().year
+
+        incomes = Income.objects.all()
+        context['incomes'] = incomes
+
+        total_income = incomes.filter(date__month=current_month, date__year=current_year).aggregate(total=Sum('amount'))['total'] or 0
+        context['total_income'] = total_income
+
+        # Income by Source
+        sources = Income.objects.values('name').annotate(total_earned=Sum('amount'))
+        context['sources'] = sources
+
+        # Total balance calculation
+        total_expenses = Expense.objects.filter(date__month=current_month, date__year=current_year).aggregate(total=Sum('amount'))['total'] or 0
+        context['remaining_balance'] = total_income - total_expenses
+
+        return context
+    
 
 class IncomeDetail(BaseDetailView):
     model = Income

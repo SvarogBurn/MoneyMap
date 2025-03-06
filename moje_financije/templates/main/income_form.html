@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ form.instance.pk|yesno:"Edit Income,Add Income" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-4">{{ form.instance.pk|yesno:"Edit Income,Add Income" }}</h1>
+    
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div>
+            <label for="id_date" class="block font-semibold">Date</label>
+            {{ form.date }}
+        </div>
+        
+        <div>
+            <label for="id_name" class="block font-semibold">Income Source</label>
+            {{ form.name }}
+        </div>
+        
+        <div>
+            <label for="id_amount" class="block font-semibold">Amount (€)</label>
+            {{ form.amount }}
+        </div>
+        
+        <div class="flex space-x-2">
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Save</button>
+            <a href="{% url 'income_list' %}" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Tailwind Styling -->
+<style>
+    input, select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+</style>
+{% endblock %}
