@@ -13,11 +13,10 @@
         <div class="container mx-auto flex justify-between items-center">
             <a href="{% url 'index' %}" class="text-white text-xl font-semibold">Money Map</a>
             <ul class="flex space-x-4">
+                {% if user.is_authenticated %}
                 <li><a href="{% url 'expense_list' %}" class="text-white hover:underline">Expenses</a></li>
                 <li><a href="{% url 'income_list' %}" class="text-white hover:underline">Income</a></li>
                 <li><a href="{% url 'goal_list' %}" class="text-white hover:underline">Goals</a></li>
-                {% if user.is_authenticated %}
-                    <li><a href="{% url 'logout' %}" class="text-white hover:underline">Logout</a></li>
                 {% else %}
                     <li><a href="{% url 'login' %}" class="text-white hover:underline">Login</a></li>
                     <li><a href="{% url 'register' %}" class="text-white hover:underline">Register</a></li>

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Expense Details{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+    <h1 class="text-2xl font-bold mb-4">Expense Details</h1>
+    
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <p class="text-lg"><strong>Date:</strong> {{ expense.date }}</p>
+            <p class="text-lg"><strong>Name:</strong> {{ expense.name }}</p>
+            <p class="text-lg"><strong>Amount:</strong> €{{ expense.amount|floatformat:2 }}</p>
+        </div>
+        <div>
+            <p class="text-lg"><strong>Category:</strong> {{ expense.category.name }}</p>
+            <p class="text-lg"><strong>Fixed Expense:</strong> {{ expense.is_fixed|yesno:"Yes,No" }}</p>
+            <p class="text-lg"><strong>Necessity:</strong> {{ expense.is_necessity|yesno:"Yes,No" }}</p>
+        </div>
+    </div>
+    
+    <div class="mt-6 flex space-x-4">
+        <a href="{% url 'expense_update' expense.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Edit</a>
+        <a href="{% url 'expense_delete' expense.pk %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Delete</a>
+        <a href="{% url 'expense_list' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Back to List</a>
+    </div>
+</div>
+{% endblock %}
