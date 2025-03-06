@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Finance Manager{% endblock %}
+{% block title %}Home - Money Map{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow text-center">
-    <h1 class="text-3xl font-bold text-blue-600">Welcome to Finance Manager</h1>
-    <p class="mt-2 text-gray-600">Track your expenses, manage your budget, and achieve your savings goals.</p>
+    <h1 class="text-3xl font-bold text-blue-600">Welcome to Money Map</h1>
+    <p class="mt-2 text-gray-600">Track your expenses, manage your budget, and achieve your goals with saving.</p>
 
     {% if user.is_authenticated %}
         <p class="mt-4 text-lg font-medium">Hello, {{ user.username }}! 👋</p>
@@ -15,13 +15,13 @@
             <a href="{% url 'expense_list' %}" 
                class="block p-6 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition">
                 <h2 class="text-xl font-semibold">💸 Expense Tracker</h2>
-                <p class="text-sm">Monitor your daily spending.</p>
+                <p class="text-sm">Monitor your monthly spending.</p>
             </a>
 
             <a href="{% url 'income_list' %}" 
                class="block p-6 bg-green-500 text-white rounded-lg shadow-lg hover:bg-green-600 transition">
                 <h2 class="text-xl font-semibold">📊 Budget Breakdown</h2>
-                <p class="text-sm">Understand where your money goes.</p>
+                <p class="text-sm">Understand where your money comes from.</p>
             </a>
 
             <a href="{% url 'goal_list' %}" 

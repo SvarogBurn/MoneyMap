@@ -1,11 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Expenses{% endblock %}
+
 {% block content %}
-    <h2>Expenses</h2>
-    <ul>
-        {% for expense in object_list %}
-            <li>
-                Name: {{ expense.name }}<br>
-                Amount: {{ expense.amount }}
-            </li>
-        {% endfor %}
-    </ul>
+<h1 class="text-2xl font-bold mb-4">Expense List</h1>
+
+<!-- Total Monthly Expense Calculation -->
+<div class="bg-blue-200 p-4 rounded-lg text-lg font-semibold mb-4">
+    Total Spent This Month: €{{ total_spent|floatformat:2 }}
+</div>
+
+<!-- Expenses Table -->
+<div class="overflow-x-auto bg-white p-6 rounded-lg shadow">
+    <table class="min-w-full border border-gray-300">
+        <thead>
+            <tr class="bg-blue-600 text-white">
+                <th class="py-2 px-4 border">Date</th>
+                <th class="py-2 px-4 border">Expense</th>
+                <th class="py-2 px-4 border">Expense Category</th>
+                <th class="py-2 px-4 border">Spending Type</th>
+                <th class="py-2 px-4 border">Want/Need</th>
+                <th class="py-2 px-4 border">Amount (€)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr class="border">
+                <td class="py-2 px-4 border">{{ expense.date }}</td>
+                <td class="py-2 px-4 border">{{ expense.name }}</td>
+                <td class="py-2 px-4 border">{{ expense.category.name }}</td>
+                <td class="py-2 px-4 border">{{ expense.is_fixed|yesno:"Yes,No" }}</td>
+                <td class="py-2 px-4 border">{{ expense.is_necessity|yesno:"Yes,No" }}</td>
+                <td class="py-2 px-4 border">€{{ expense.amount|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="py-4 text-center text-gray-500">No expenses recorded.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pie Charts Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+    <!-- Expense Category Pie Chart -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4">Spending Breakdown</h2>
+        <canvas id="expenseChart"></canvas>
+    </div>
+
+    <!-- Wants vs. Needs Pie Chart -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4">Wants vs. Needs</h2>
+        <canvas id="wantsNeedsChart"></canvas>
+    </div>
+
+    <!-- Fixed vs. Variable Pie Chart -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4">Fixed vs. Variable</h2>
+        <canvas id="fixedVariableChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Spending Breakdown Chart
+    const ctx1 = document.getElementById('expenseChart').getContext('2d');
+    const expenseData = {
+        labels: [{% for category in categories %}"{{ category.name }}",{% endfor %}],
+        datasets: [{
+            label: 'Expenses by Category',
+            data: [{% for category in categories %}{{ category.total_spent }},{% endfor %}],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#9966FF', '#FF9F40'],
+        }]
+    };
+    new Chart(ctx1, { type: 'pie', data: expenseData });
+
+    // Wants vs. Needs Chart
+    const ctx2 = document.getElementById('wantsNeedsChart').getContext('2d');
+    const wantsNeedsData = {
+        labels: ['Wants', 'Needs'],
+        datasets: [{
+            label: 'Wants vs. Needs',
+            data: [{{ wants_vs_needs.Wants }}, {{ wants_vs_needs.Needs }}],
+            backgroundColor: ['#FF6384', '#4CAF50'],
+        }]
+    };
+    new Chart(ctx2, { type: 'pie', data: wantsNeedsData });
+
+    // Fixed vs. Variable Chart
+    const ctx3 = document.getElementById('fixedVariableChart').getContext('2d');
+    const fixedVariableData = {
+        labels: ['Fixed', 'Variable'],
+        datasets: [{
+            label: 'Fixed vs. Variable',
+            data: [{{ fixed_vs_variable.Fixed }}, {{ fixed_vs_variable.Variable }}],
+            backgroundColor: ['#36A2EB', '#FFCE56'],
+        }]
+    };
+    new Chart(ctx3, { type: 'pie', data: fixedVariableData });
+</script>
 {% endblock %}

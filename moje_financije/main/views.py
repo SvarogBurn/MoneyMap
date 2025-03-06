@@ -5,7 +5,8 @@ from django.contrib.auth import authenticate, login
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from main.models import Expense, Income, Goal
+from main.models import Expense, Income, Goal, Category
+from django.db.models import Sum
 
 #------------------------Mixin for Filtering--------------------------------
 class SearchMixin:
@@ -47,26 +48,60 @@ class BaseDeleteView(LoginRequiredMixin, DeleteView):
 #------------------------Expenses--------------------------------
 class ExpenseList(BaseListView):
     model = Expense
-    search_fields = ['name', 'amount', 'date', 'is_fixed', 'is_necessary', 'category']
+    search_fields = ['name', 'amount', 'date', 'is_fixed', 'is_necessity', 'category']
     template_name = 'main/expense_list.html'
+    context_object_name = "expenses"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
+        from django.utils.timezone import now
+        current_month = now().month
+        current_year = now().year
+
+        expenses = Expense.objects.all()
+        context['expenses'] = expenses
+        
+        total_spent = expenses.filter(date__month=current_month, date__year=current_year).aggregate(total=Sum('amount'))['total'] or 0
+        context['total_spent'] = total_spent
+
+        # Expenses by Category
+        categories = Expense.objects.values('category').annotate(total_spent=Sum('amount'))
+        for i in categories:
+            i['name'] = Category.objects.get(pk=i['category']).name
+        
+        context['categories'] = categories
+        print(categories)  
+
+        # Wants vs. Needs
+        wants_total = expenses.filter(is_necessity=False).aggregate(total=Sum('amount'))['total'] or 0
+        needs_total = expenses.filter(is_necessity=True).aggregate(total=Sum('amount'))['total'] or 0
+        context['wants_vs_needs'] = {'Wants': wants_total, 'Needs': needs_total}
+
+        # Fixed vs. Variable
+        fixed_total = expenses.filter(is_fixed=True).aggregate(total=Sum('amount'))['total'] or 0
+        variable_total = expenses.filter(is_fixed=False).aggregate(total=Sum('amount'))['total'] or 0
+        context['fixed_vs_variable'] = {'Fixed': fixed_total, 'Variable': variable_total}
+
+        return context
+    
 class ExpenseDetail(BaseDetailView):
     model = Expense
     template_name = 'main/expense_detail.html'
 
 class ExpenseCreate(BaseCreateView):
     model = Expense
-    fields = ['date', 'name', 'amount', 'category', 'is_fixed', 'is_necessary']
+    fields = ['date', 'name', 'amount', 'category', 'is_fixed', 'is_necessity']
     template_name = 'main/expense_form.html'
 
 class ExpenseUpdate(BaseUpdateView):
     model = Expense
-    fields = ['date', 'name', 'amount', 'category', 'is_fixed', 'is_necessary']
+    fields = ['date', 'name', 'amount', 'category', 'is_fixed', 'is_necessity']
     template_name = 'main/expense_form.html'
 
 class ExpenseDelete(BaseDeleteView):
     model = Expense
-    template_name = 'main/expense_confirm_delete.html'
+    template_name = 'main/object_confirm_delete.html'
 
 #------------------------Income--------------------------------
 class IncomeList(BaseListView):
@@ -89,7 +124,7 @@ class IncomeUpdate(BaseUpdateView):
 
 class IncomeDelete(BaseDeleteView):
     model = Income
-    template_name = 'main/income_confirm_delete.html'
+    template_name = 'main/object_confirm_delete.html'
 
 #------------------------Goals--------------------------------
 class GoalList(BaseListView):
@@ -112,7 +147,7 @@ class GoalUpdate(BaseUpdateView):
 
 class GoalDelete(BaseDeleteView):
     model = Goal
-    template_name = 'main/goal_confirm_delete.html'
+    template_name = 'main/object_confirm_delete.html'
 
 #------------------------Authentication--------------------------------
 def index(request):
