@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Finance Manager{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{% url 'index' %}" class="text-white text-xl font-semibold">Finance Manager</a>
+            <ul class="flex space-x-4">
+                <li><a href="{% url 'expense_list' %}" class="text-white hover:underline">Expenses</a></li>
+                <li><a href="{% url 'income_list' %}" class="text-white hover:underline">Income</a></li>
+                <li><a href="{% url 'goal_list' %}" class="text-white hover:underline">Goals</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}" class="text-white hover:underline">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}" class="text-white hover:underline">Login</a></li>
+                    <li><a href="{% url 'register' %}" class="text-white hover:underline">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-6 p-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-blue-600 text-white text-center py-4 mt-6">
+        <p>&copy; 2025 Finance Manager | All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

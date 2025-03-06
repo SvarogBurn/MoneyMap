@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
+    <h2 class="text-2xl font-semibold">{{ object }}</h2>
+
+    <ul class="mt-4 space-y-2">
+        {% for field in object._meta.fields %}
+            <li><strong>{{ field.verbose_name }}:</strong> {{ object|getattr:field.name }}</li>
+        {% endfor %}
+    </ul>
+
+    <div class="mt-6 space-x-2">
+        <a href="{% url model_name|lower|add:'_update' pk=object.pk %}" 
+           class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">Edit</a>
+        <a href="{% url model_name|lower|add:'_delete' pk=object.pk %}" 
+           class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</a>
+        <a href="{% url model_name|lower|add:'_list' %}" 
+           class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Back to List</a>
+    </div>
+</div>
+{% endblock %}

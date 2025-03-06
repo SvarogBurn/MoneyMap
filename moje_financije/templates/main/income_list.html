@@ -1,0 +1,11 @@
+{% block content %}
+    <h2>Incomes</h2>
+    <ul>
+        {% for Income in object_list %}
+            <li>
+                Name: {{ Income.name }}<br>
+                Amount: {{ Income.amount }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

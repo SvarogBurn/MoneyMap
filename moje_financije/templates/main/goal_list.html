@@ -1,0 +1,11 @@
+{% block content %}
+    <h2>SavingGoals</h2>
+    <ul>
+        {% for SavingGoal in object_list %}
+            <li>
+                Name: {{ SavingGoal.name }}<br>
+                Amount: {{ SavingGoal.amount }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
