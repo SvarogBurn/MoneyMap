@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
     <h2 class="text-2xl font-semibold">Confirm Delete</h2>
@@ -11,9 +12,22 @@
         </button>
     </form>
 
-    <a href="{% url model_name|lower|add:'_detail' pk=object.pk %}" 
-       class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
-       Cancel
-    </a>
+    {% if model_name == "income" %}
+        <a href="{% url 'income_list' %}" class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+            Cancel
+        </a>
+    {% elif model_name == "expense" %}
+        <a href="{% url 'expense_list' %}" class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+            Cancel
+        </a>
+    {% elif model_name == "goal" %}
+        <a href="{% url 'goal_list' %}" class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+            Cancel
+        </a>
+    {% else %}
+        <a href="{% url 'index' %}" class="mt-4 inline-block bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+            Cancel
+        </a>
+    {% endif %}
 </div>
 {% endblock %}

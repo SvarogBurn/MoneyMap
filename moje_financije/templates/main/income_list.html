@@ -41,7 +41,7 @@
 </div>
 
 <!-- Balance Section -->
-<div class="bg-gray-100 p-6 mt-6 rounded-lg shadow-lg text-lg font-semibold">
-    <p>Remaining Balance: <span class="font-bold text-gray-800">€{{ remaining_balance|floatformat:2 }}</span></p>
+<div class="bg-green-200 {% if remaining_balance < 0 %}{{"bg-red-200"}}{% endif %} p-6 mt-6 rounded-lg shadow-lg text-lg font-semibold">
+    <p>Net Flow: <span class="font-bold text-gray-800">€{{ remaining_balance|floatformat:2 }}</span></p>
 </div>
 {% endblock %}

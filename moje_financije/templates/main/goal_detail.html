@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Goal Details{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+    <h1 class="text-2xl font-bold mb-4">Goal Details</h1>
+    
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <p class="text-lg"><strong>Name:</strong> {{ goal.name }}</p>
+            <p class="text-lg"><strong>Target Amount:</strong> €{{ goal.amount|floatformat:2 }}</p>
+            <p class="text-lg"><strong>Saved So Far:</strong> €{{ goal.saved|floatformat:2 }}</p>
+        </div>
+    </div>
+    
+    <div class="mt-6 flex space-x-4">
+        <a href="{% url 'goal_update' goal.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Edit</a>
+        <a href="{% url 'goal_delete' goal.pk %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Delete</a>
+        <a href="{% url 'goal_list' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Back to List</a>
+    </div>
+</div>
+{% endblock %}

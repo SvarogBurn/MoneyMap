@@ -1,11 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Goals | Money Map{% endblock %}
+
 {% block content %}
-    <h2>SavingGoals</h2>
-    <ul>
-        {% for SavingGoal in object_list %}
-            <li>
-                Name: {{ SavingGoal.name }}<br>
-                Amount: {{ SavingGoal.amount }}
-            </li>
-        {% endfor %}
-    </ul>
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-yellow-600 mb-4">Your Financial Goals</h1>
+    
+    <!-- Search Bar -->
+    <form method="GET" action="" class="mb-4 flex">
+        <input type="text" name="q" placeholder="Search goals..." class="border p-2 rounded-l w-full">
+        <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded-r">Search</button>
+    </form>
+    
+    <!-- Add New Goal Button -->
+    <div class="mb-4">
+        <a href="{% url 'goal_create' %}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">+ Add Goal</a>
+    </div>
+
+    <!-- Goal List Table -->
+    <div class="overflow-x-auto">
+        <table class="w-full table-auto border-collapse border border-gray-200">
+            <thead>
+                <tr class="bg-yellow-200">
+                    <th class="border p-3 text-left">Goal Name</th>
+                    <th class="border p-3 text-left">Target Amount (€)</th>
+                    <th class="border p-3 text-left">Saved Amount (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goal in object_list %}
+                <tr class="border">
+                    <td class="border p-3">
+                        <!-- Add Link to Goal Detail -->
+                        <a href="{% url 'goal_detail' goal.pk %}" class="text-yellow-500 hover:text-yellow-700 font-semibold">
+                            {{ goal.name }}
+                        </a>
+                    </td>
+                    <td class="border p-3">${{ goal.amount }}</td>
+                    <td class="border p-3">${{ goal.saved }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-gray-500 text-center p-3">No goals found. Start by adding a new goal!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

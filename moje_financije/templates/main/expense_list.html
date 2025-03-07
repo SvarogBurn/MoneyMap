@@ -12,19 +12,72 @@
     <a href="{% url 'expense_create' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 shadow-lg">+ Add Expense</a>
 </div>
 
+<form method="GET" class="mb-6 flex flex-wrap gap-4 bg-white p-4 rounded-lg shadow-md">
+    <!-- Category Filter -->
+    <div>
+        <label class="block text-gray-700 font-semibold">Category:</label>
+        <select name="category" class="border p-2 rounded">
+            <option value="">All</option>
+            {% for category in all_categories %}
+                <option value="{{ category.name }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Fixed/Variable Filter -->
+    <div>
+        <label class="block text-gray-700 font-semibold">Spending Type:</label>
+        <label><input type="radio" name="fixed_variable" value="Fixed"> Fixed</label>
+        <label><input type="radio" name="fixed_variable" value="Variable"> Variable</label>
+    </div>
+
+    <!-- Want/Need Filter -->
+    <div>
+        <label class="block text-gray-700 font-semibold">Want/Need:</label>
+        <label><input type="radio" name="necessity" value="Need"> Need</label>
+        <label><input type="radio" name="necessity" value="Want"> Want</label>
+    </div>
+
+    <!-- Amount Range Filter -->
+    <div>
+        <label class="block text-gray-700 font-semibold">Amount Range (€):</label>
+        <input type="number" name="min_amount" placeholder="Min" class="border p-2 rounded w-20">
+        <input type="number" name="max_amount" placeholder="Max" class="border p-2 rounded w-20">
+    </div>
+
+    <!-- Name Filter -->
+    <div>
+        <label class="block text-gray-700 font-semibold">Expense Name:</label>
+        <input type="text" name="name" placeholder="Search name" class="border p-2 rounded">
+    </div>
+
+    <!-- Submit Button -->
+    <div class="self-end">
+        <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">Filter</button>
+    </div>
+</form>
+
+
 <!-- Expenses Table -->
-<div class="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
+<div class="overflow-x-auto bg-white p-6 rounded-lg shadow-lg max-h-50">
     <table class="min-w-full border border-gray-300">
         <thead>
             <tr class="bg-blue-600 text-white text-left">
                 <th class="py-3 px-4 border">Date</th>
                 <th class="py-3 px-4 border">Expense</th>
-                <th class="py-3 px-4 border">Category</th>
-                <th class="py-3 px-4 border">Spending Type</th>
-                <th class="py-3 px-4 border">Want/Need</th>
+                <th class="py-3 px-4 border">
+                    <a href="?category=" class="hover:underline">Category</a>
+                </th>
+                <th class="py-3 px-4 border">
+                    <a href="?fixed_variable=Fixed" class="hover:underline">Spending Type</a>
+                </th>
+                <th class="py-3 px-4 border">
+                    <a href="?necessity=Need" class="hover:underline">Want/Need</a>
+                </th>
                 <th class="py-3 px-4 border">Amount (€)</th>
             </tr>
         </thead>
+        
         <tbody>
             {% for expense in expenses %}
             <tr class="border hover:bg-gray-100">

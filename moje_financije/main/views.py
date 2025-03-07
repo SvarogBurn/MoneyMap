@@ -45,12 +45,55 @@ class BaseDeleteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy(f"{self.model.__name__.lower()}_list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["model_name"] = self.model.__name__.lower()  # Pass model name to the template
+        return context
+
+
 #------------------------Expenses--------------------------------
 class ExpenseList(BaseListView):
     model = Expense
     search_fields = ['name', 'amount', 'date', 'is_fixed', 'is_necessity', 'category']
     template_name = 'main/expense_list.html'
     context_object_name = "expenses"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        category = self.request.GET.get('category')
+        is_fixed = self.request.GET.get('fixed_variable')
+        is_necessity = self.request.GET.get('necessity')
+        min_amount = self.request.GET.get('min_amount')
+        max_amount = self.request.GET.get('max_amount')
+        search_name = self.request.GET.get('name')
+        
+        # Apply filters if parameters exist
+        if category:
+            queryset = queryset.filter(category__name=category)
+
+        if is_fixed in ['Fixed', 'Variable']:
+            queryset = queryset.filter(is_fixed=(is_fixed == 'Fixed'))
+
+        if is_necessity in ['Need', 'Want']:
+            queryset = queryset.filter(is_necessity=(is_necessity == 'Need'))
+
+        if min_amount:
+            queryset = queryset.filter(amount__gte=min_amount)
+
+        if max_amount:
+            queryset = queryset.filter(amount__lte=max_amount)
+
+        if search_name:
+            queryset = queryset.filter(name__icontains=search_name)
+            
+        return queryset
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()  # Pass categories for filtering dropdown
+        return context
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,19 +101,21 @@ class ExpenseList(BaseListView):
         current_month = now().month
         current_year = now().year
 
-        expenses = Expense.objects.all()
+        expenses = self.object_list
         context['expenses'] = expenses
         
         total_spent = expenses.filter(date__month=current_month, date__year=current_year).aggregate(total=Sum('amount'))['total'] or 0
         context['total_spent'] = total_spent
 
         # Expenses by Category
-        categories = Expense.objects.values('category').annotate(total_spent=Sum('amount'))
+        included_categories = { e.category.name for e in expenses }
+        print(included_categories)
+        categories = Expense.objects.filter(category__name__in=included_categories).values('category').annotate(total_spent=Sum('amount'))
         for i in categories:
             i['name'] = Category.objects.get(pk=i['category']).name
-        
+
         context['categories'] = categories
-        print(categories)  
+        context['all_categories'] = Category.objects.all()
 
         # Wants vs. Needs
         wants_total = expenses.filter(is_necessity=False).aggregate(total=Sum('amount'))['total'] or 0
@@ -151,6 +196,7 @@ class IncomeDelete(BaseDeleteView):
 class GoalList(BaseListView):
     model = Goal
     template_name = 'main/goal_list.html'
+    search_fields = ['name', 'amount', 'saved']
 
 class GoalDetail(BaseDetailView):
     model = Goal
