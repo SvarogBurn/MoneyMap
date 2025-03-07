@@ -196,7 +196,17 @@ class IncomeDelete(BaseDeleteView):
 class GoalList(BaseListView):
     model = Goal
     template_name = 'main/goal_list.html'
-    search_fields = ['name', 'amount', 'saved']
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        goals = context['object_list']
+        
+        # Add dynamically calculated field for each goal
+        for goal in goals:
+            goal.amount_left = max(goal.amount - goal.saved, 0)
+
+        context['goals'] = goals  # Ensure context contains updated goal list
+        return context
 
 class GoalDetail(BaseDetailView):
     model = Goal

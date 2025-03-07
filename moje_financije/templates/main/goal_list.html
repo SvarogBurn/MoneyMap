@@ -17,35 +17,85 @@
         <a href="{% url 'goal_create' %}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">+ Add Goal</a>
     </div>
 
-    <!-- Goal List Table -->
-    <div class="overflow-x-auto">
-        <table class="w-full table-auto border-collapse border border-gray-200">
-            <thead>
-                <tr class="bg-yellow-200">
-                    <th class="border p-3 text-left">Goal Name</th>
-                    <th class="border p-3 text-left">Target Amount (€)</th>
-                    <th class="border p-3 text-left">Saved Amount (€)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for goal in object_list %}
-                <tr class="border">
-                    <td class="border p-3">
-                        <!-- Add Link to Goal Detail -->
-                        <a href="{% url 'goal_detail' goal.pk %}" class="text-yellow-500 hover:text-yellow-700 font-semibold">
-                            {{ goal.name }}
-                        </a>
-                    </td>
-                    <td class="border p-3">${{ goal.amount }}</td>
-                    <td class="border p-3">${{ goal.saved }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3" class="text-gray-500 text-center p-3">No goals found. Start by adding a new goal!</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Goal List Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full table-auto border-collapse border border-gray-200">
+                <thead>
+                    <tr class="bg-yellow-200">
+                        <th class="border p-3 text-left">Goal Name</th>
+                        <th class="border p-3 text-left">Target Amount (€)</th>
+                        <th class="border p-3 text-left">Saved Amount (€)</th>
+                        <th class="border p-3 text-left">Amount Left (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for goal in goals %}
+                    <tr class="border">
+                        <td class="border p-3">
+                            <a href="{% url 'goal_detail' goal.pk %}" class="text-yellow-500 hover:text-yellow-700 font-semibold">
+                                {{ goal.name }}
+                            </a>
+                        </td>
+                        <td class="border p-3">€{{ goal.amount }}</td>
+                        <td class="border p-3">€{{ goal.saved }}</td>
+                        <td class="border p-3">€{{ goal.amount_left }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-gray-500 text-center p-3">No goals found. Start by adding a new goal!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold text-yellow-600 mb-4">Savings Progress</h2>
+            <canvas id="goalsChart"></canvas>
+        </div>
     </div>
 </div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx = document.getElementById('goalsChart').getContext('2d');
+        
+        var goalsData = {
+            labels: [{% for goal in goals %}"{{ goal.name }}",{% endfor %}],
+            datasets: [{
+                label: 'Percentage Saved',
+                data: [{% for goal in goals %}{{ goal.saved|floatformat:2 }} / {{ goal.amount|floatformat:2 }} * 100,{% endfor %}],
+                backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var goalsChart = new Chart(ctx, {
+            type: 'bar',
+            data: goalsData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + "%";
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
