@@ -8,6 +8,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from main.models import Expense, Income, Goal, Category
 from django.db.models import Sum
 from django.utils.timezone import now
+from django.db.models.functions import TruncMonth
 #------------------------Mixin for Filtering--------------------------------
 class SearchMixin:
     search_fields = []
@@ -59,7 +60,7 @@ class ExpenseList(BaseListView):
     context_object_name = "expenses"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = Expense.objects.filter(user=self.request.user)
 
         category = self.request.GET.get('category')
         is_fixed = self.request.GET.get('fixed_variable')
@@ -104,7 +105,7 @@ class ExpenseList(BaseListView):
         expenses = self.object_list
         context['expenses'] = expenses
         
-        total_spent = expenses.filter(date__month=current_month, date__year=current_year).aggregate(total=Sum('amount'))['total'] or 0
+        total_spent = expenses.filter(user=self.request.user).aggregate(total=Sum('amount'))['total'] or 0
         context['total_spent'] = total_spent
 
         # Expenses by Category
@@ -154,21 +155,23 @@ class IncomeList(BaseListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        current_month = now().month
-        current_year = now().year
-
-        incomes = Income.objects.all()
+        incomes = Income.objects.filter(user=self.request.user)
         context['incomes'] = incomes
 
-        total_income = incomes.filter(date__month=current_month, date__year=current_year).aggregate(total=Sum('amount'))['total'] or 0
+        total_income = incomes.aggregate(total=Sum('amount'))['total'] or 0
         context['total_income'] = total_income
 
-        # Income by Source
-        sources = Income.objects.values('name').annotate(total_earned=Sum('amount'))
-        context['sources'] = sources
+        # Income grouped by month
+        monthly_income = (
+            incomes.annotate(month=TruncMonth('date'))
+            .values('month')
+            .annotate(total_earned=Sum('amount'))
+            .order_by('month')
+        )
+        context['monthly_income'] = monthly_income
 
         # Total balance calculation
-        total_expenses = Expense.objects.filter(date__month=current_month, date__year=current_year).aggregate(total=Sum('amount'))['total'] or 0
+        total_expenses = Expense.objects.filter(user=self.request.user).aggregate(total=Sum('amount'))['total'] or 0
         context['remaining_balance'] = total_income - total_expenses
 
         return context
@@ -199,13 +202,12 @@ class GoalList(BaseListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        goals = context['object_list']
+        context['goals'] = Goal.objects.filter(user=self.request.user)
         
         # Add dynamically calculated field for each goal
-        for goal in goals:
+        for goal in context['goals']:
             goal.amount_left = max(goal.amount - goal.saved, 0)
 
-        context['goals'] = goals  # Ensure context contains updated goal list
         return context
 
 class GoalDetail(BaseDetailView):

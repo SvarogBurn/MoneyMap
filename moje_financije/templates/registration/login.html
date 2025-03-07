@@ -3,48 +3,54 @@
 {% block title %}Login - Money Map{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white p-8 border border-gray-300 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
-    
-    {% if form.errors %}
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-center">
-            <p>Unos nije ispravan. Molimo pokušajte ponovo.</p>
-        </div>
-    {% endif %}
-    
-    {% if next %}
-        {% if user.is_authenticated %}
-            <div class="bg-yellow-100 text-yellow-700 p-3 rounded mb-4 text-center">
-                <p>Your account doesn't have access to this page.</p>
-                <p>Please login with an account that has access.</p>
-            </div>
-        {% else %}
-            <div class="bg-blue-100 text-blue-700 p-3 rounded mb-4 text-center">
-                <p>Please login to see this page.</p>
+<div class="flex justify-center items-center min-h-screen">
+    <div class="w-full max-w-md bg-white p-8 border border-gray-300 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
+        
+        {% if form.errors %}
+            <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-center">
+                <p>Unos nije ispravan. Molimo pokušajte ponovo.</p>
             </div>
         {% endif %}
-    {% endif %}
-    
-    <form method="post" action="{% url 'login' %}" class="space-y-4">
-        {% csrf_token %}
         
-        <div>
-            <label for="id_username" class="block text-gray-700">Username</label>
-            {{ form.username }}
-        </div>
+        {% if next %}
+            {% if user.is_authenticated %}
+                <div class="bg-yellow-100 text-yellow-700 p-3 rounded mb-4 text-center">
+                    <p>Your account doesn't have access to this page.</p>
+                    <p>Please login with an account that has access.</p>
+                </div>
+            {% else %}
+                <div class="bg-blue-100 text-blue-700 p-3 rounded mb-4 text-center">
+                    <p>Please login to see this page.</p>
+                </div>
+            {% endif %}
+        {% endif %}
         
-        <div>
-            <label for="id_password" class="block text-gray-700">Password</label>
-            {{ form.password }}
-        </div>
+        <form method="post" action="{% url 'login' %}" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="id_username" class="block text-gray-700">Username</label>
+                <input type="text" name="username" id="id_username" 
+                    class="w-full border border-gray-300 p-2 rounded" required>
+            </div>
+
+            <div>
+                <label for="id_password" class="block text-gray-700">Password</label>
+                <input type="password" name="password" id="id_password" 
+                    class="w-full border border-gray-300 p-2 rounded" required>
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}">
+            
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Login
+            </button>
+        </form>
         
-        <input type="hidden" name="next" value="{{ next }}">
-        
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Login</button>
-    </form>
-    
-    <p class="text-center text-sm text-gray-600 mt-4">
-        Don't have an account? <a href="{% url 'register' %}" class="text-blue-600 hover:underline">Register here</a>
-    </p>
+        <p class="text-center text-sm text-gray-600 mt-4">
+            Don't have an account? <a href="{% url 'register' %}" class="text-blue-600 hover:underline">Register here</a>
+        </p>
+    </div>
 </div>
 {% endblock %}

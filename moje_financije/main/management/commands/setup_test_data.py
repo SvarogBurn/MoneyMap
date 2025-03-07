@@ -6,10 +6,11 @@ from django.core.management.base import BaseCommand
 from main.models import *
 from main.factories import *
 
-NUM_EXPENSES = 10
+NUM_EXPENSES = 200
 NUM_CATEGORIES = 5
-NUM_INCOMES = 100
+NUM_INCOMES = 200
 NUM_GOALS = 5
+NUM_USERS = 10
 
 
 class Command(BaseCommand):
@@ -24,12 +25,12 @@ class Command(BaseCommand):
 
         self.stdout.write("Creating new data...")
 
-        for _ in range(NUM_EXPENSES):
-            account = ExpenseFactory()
-
+        for _ in range(NUM_USERS):
+            expense = UserFactory()
         for _ in range(NUM_CATEGORIES):
             category = CategoryFactory()
-            
+        for _ in range(NUM_EXPENSES):
+            expense = ExpenseFactory()
         for _ in range(NUM_INCOMES):
             transaction = IncomeFactory()
         for _ in range(NUM_GOALS):

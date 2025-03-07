@@ -15,7 +15,7 @@
 <!-- Main Content: Table and Chart -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Income Table -->
-    <div class="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
+    <div class="overflow-x-auto bg-white p-6 rounded-lg shadow-lg max-h-100">
         <table class="min-w-full border border-gray-300">
             <thead>
                 <tr class="bg-green-600 text-white text-left">
@@ -60,42 +60,32 @@
     document.addEventListener("DOMContentLoaded", function() {
         var lineCtx = document.getElementById('incomeLineChart').getContext('2d');
 
-        // Extracting dates (formatted as YYYY-MM-DD) and cumulative income
-        var incomeDates = [{% for income in incomes %}"{{ income.date|date:"Y-m-d" }}",{% endfor %}];
-        var incomeCumulative = [];
-        var total = 0;
-        {% for income in incomes %}
-            total += {{ income.amount }};
-            incomeCumulative.push(total);
-        {% endfor %}
+        // Extracting months and total earned
+        var incomeMonths = [{% for income in monthly_income %}"{{ income.month|date:"Y-m" }}",{% endfor %}];
+        var incomeTotals = [{% for income in monthly_income %}{{ income.total_earned }},{% endfor %}];
 
         var lineChart = new Chart(lineCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
-                labels: incomeDates,
+                labels: incomeMonths,
                 datasets: [{
-                    label: 'Cumulative Income (€)',
-                    data: incomeCumulative,
+                    label: 'Monthly Income (€)',
+                    data: incomeTotals,
+                    backgroundColor: 'rgba(102, 187, 106, 0.5)',
                     borderColor: '#66bb6a',
-                    backgroundColor: 'rgba(102, 187, 106, 0.2)',
-                    borderWidth: 2,
-                    fill: true,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#66bb6a'
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 scales: {
-                    x: { 
-                        title: { display: true, text: 'Date' },
-                        ticks: { autoSkip: true, maxTicksLimit: 10 } // Keeps x-axis readable
-                    },
-                    y: { title: { display: true, text: 'Cumulative Income (€)' } }
+                    x: { title: { display: true, text: 'Month' } },
+                    y: { title: { display: true, text: 'Income (€)' } }
                 }
             }
         });
     });
 </script>
+
 
 {% endblock %}
